@@ -1,0 +1,121 @@
+Pow Task
+Develop a pow() function that takes two arguments (a, b) and raises the first argument to the power of the second (a^b).
+
+Check
+
+pow 2 3
+8
+
+
+
+pow 2 5
+32
+
+
+
+Shortest string function
+Develop the shortest() function, which can take an unlimited number of arguments(strings) and output the shortest argument.
+
+Check
+
+shortest "This" "is" "Bash" "Functions" "Task"
+is
+
+
+If there are more than two arguments, output each string on a new line. In an order they are passed to function.
+
+shortest "Java" "Bash" "Python"
+Java
+Bash
+
+
+
+Log function
+Develop a print_log() function that takes a string as an argument and outputs the same string with the date at the beginning.
+In order for the automatic check to work, the string must be in this format: YEAR-MONTH-DAY HOUR:MINUTES
+
+print_log "Hello World!"
+[2022-05-10 13:04] Hello World!
+
+
+
+print_log "Hello Bash!"
+[2022-05-10 13:10] Hello Bash!
+
+======================================================================
+
+#!/bin/bash
+
+#################============*************===============#############
+# Функция для возведения числа в степень
+#################============*************===============#############
+
+function pow(){
+        local a=$1
+        local b=$2
+
+        echo $((a**b))
+}
+
+#################============*************===============#############
+# Функция для вывода самого короткого аргумента
+#################============*************===============#############
+
+shortest() {
+    shortest_length=${#1}
+    shortest_args=("$1")
+
+    for arg in "${@:2}"; do
+         length=${#arg}
+        if [ "$length" -lt "$shortest_length" ]; then
+            shortest_args=("$arg")
+            shortest_length=$length
+        elif [ "$length" -eq "$shortest_length" ]; then
+            shortest_args+=("$arg")
+        fi
+    done
+
+    for shortest_arg in "${shortest_args[@]}"; do
+        echo "$shortest_arg"
+    done
+}
+
+#################============*************===============#############
+# Функция для вывода строки с датой в начале
+#################============*************===============#############
+
+print_log() {
+    echo "[$(date +'%Y-%m-%d %H:%M')] $1"
+}
+
+
+case "$1" in
+        "pow" )
+                if [ "$#" -eq 3 ]; then
+                        pow_val=$(pow "$2" "$3")
+                        echo $pow_val
+                else
+                        echo "Usage: $0 pow <base> <exp>"
+                        exit 1
+                fi
+        ;;
+        "shortest" )
+                shift
+                shortest "$@"
+        ;;
+        "print_log" )
+                if [ -z "$2" ]; then
+                        echo "Usage: $0 print_log <message>"
+                        exit 1
+                fi
+                print_log "$2"
+        ;;
+        * )
+                echo "Usage: $0 {pow|shortest|print_log}"
+                exit 1
+        ;;
+esac
+                echo "Usage: $0 {pow|shortest|print_log}"
+                exit 1
+        ;;
+esac
