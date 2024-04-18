@@ -1,0 +1,47 @@
+Task
+Develop a script that takes number (count of needed folders up to 26) as an argument and create this folders in current directory with next naming convention folder_<[a-z]>.
+
+Check
+./array.sh 5
+5 folders created:
+folder_a, folder_b, folder_c, folder_c, folder_d
+./array.sh 1
+1 folder created:
+folder_a
+./array.sh 2
+2 folders created:
+folder_a, folder_b
+
+=======================================================================================
+
+#!/bin/bash
+
+# Проверка наличия аргумента
+if [ -z "$1" ]; then
+    echo "Usage: $0 <number of folders>"
+    exit 1
+fi
+
+# Проверка, что аргумент - число
+if ! [[ "$1" =~ ^[0-9]+$ ]]; then
+    echo "Error: Argument must be a number"
+    exit 1
+fi
+
+# Проверка, что аргумент <= 26
+if [ "$1" -gt 26 ]; then
+    echo "Error: Argument must be less than or equal to 26"
+    exit 1
+fi
+
+# Создание папок
+echo "$1 folders created:"
+for ((i=0; i<$1; i++)); do
+    folder_name="folder_$(printf \\$(printf '%03o' $((97+i))))"  # Генерация имени папки: folder_a, folder_b, ...
+    mkdir "$folder_name"
+    echo -n "$folder_name"
+    if [ $i -lt $(($1 - 1)) ]; then
+        echo -n ", "
+    fi
+done
+echo ""
