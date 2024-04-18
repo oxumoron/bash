@@ -1,0 +1,152 @@
+Task 1
+An unsorted list is passed to the script. Write a program that will output the sum of even numbers
+
+Check
+./cond1.sh "1,2,3,4,5,6,7"
+12
+./cond1.sh "4,3,1"
+4
+./cond1.sh "2,2,9,3,8"
+12
+./cond1.sh ""
+0
+
+Task 2
+Develop a script that takes the temperature value in Celsius OR Kelvins and returns the inverse value.
+The formula is pretty simple: C = K - 273; K = C + 273
+
+Check
+./temp.sh 55C
+328K
+./temp.sh 122K
+-151C
+./temp.sh 98C
+371K
+
+Task 3
+Develop script that takes any string and calculate count of letters, numbers, symbols *!@#$%^&()_+ inside except whitespaces
+
+Check
+./check_string.sh "Hello ! ** 564gfhf"
+Numbers: 3 Symbols: 3 Letters: 9
+./check_string.sh "Hello !   +"
+Numbers: 0 Symbols: 2 Letters: 5
+./check_string.sh "Hello !!"
+Numbers: 0 Symbols: 2 Letters: 5
+
+#!/bin/bash
+###############====================********************==================###################
+# Функция для подсчета количества букв, цифр и символов в строке
+###############====================********************==================###################
+
+count_characters() {
+    local string="$1"
+    local letters=0
+    local numbers=0
+    local symbols=0
+
+    # Убираем все пробелы из строки
+    string=$(echo "$string" | tr -d ' ')
+
+    # Подсчет количества букв, цифр и символов
+    for ((i = 0; i < ${#string}; i++)); do
+        char="${string:$i:1}"
+        if [[ "$char" =~ [[:alpha:]] ]]; then
+            ((letters++))
+        elif [[ "$char" =~ [[:digit:]] ]]; then
+            ((numbers++))
+        elif [[ "$char" =~ [[:punct:]] ]]; then
+            ((symbols++))
+        fi
+    done
+
+    echo "Numbers: $numbers Symbols: $symbols Letters: $letters"
+}
+
+# Проверка наличия аргумента
+if [ -z "$1" ]; then
+    echo "Usage: $0 <string>"
+    exit 1
+fi
+
+# Получение количества букв, цифр и символов в строке
+count_characters "$1"
+
+
+
+#!/bin/bash
+###############====================********************==================###################
+# Function to calculate the sum of even numbers in the input list
+###############====================********************==================###################
+
+sum_even_numbers() {
+    local input="$1"
+    local sum=0
+    if [[ $input == *,* ]]; then
+        IFS=',' read -r -a array <<< "$input"  # Split input string into an array using comma as delimiter
+        for number in "${array[@]}"; do
+            if (( number % 2 == 0 )); then     # Check if number is even
+                sum=$(( sum + number ))        # Add even number to sum
+            fi
+        done
+    else
+        sum="- $input"  # Set sum equal to input when there's only one number
+    fi
+    echo "$sum"
+}
+
+
+# Main script
+input="$1"
+if [[ -n "$input" ]]; then
+    sum_even_numbers "$input"
+else
+    echo "0"  # Empty input string
+fi
+
+
+#!/bin/bash
+###############====================********************==================###################
+# Функция для конвертации температуры из Цельсия в Кельвины
+###############====================********************==================###################
+
+celsius_to_kelvin() {
+    local celsius="$1"
+    local kelvin=$((celsius + 273))
+    echo "$kelvin"
+}
+
+# Функция для конвертации температуры из Кельвинов в Цельсии
+kelvin_to_celsius() {
+    local kelvin="$1"
+    local celsius=$((kelvin - 273))
+    echo "$celsius"
+}
+
+# Основная часть скрипта
+if [ -z "$1" ]; then
+    echo "Usage: $0 <temperature>C|K"
+    exit 1
+fi
+
+temp_str="$1"
+
+# Извлечение числового значения и типа температуры из аргумента
+temp_value=$(echo "$temp_str" | sed 's/[^0-9]*//g')
+temp_type=$(echo "$temp_str" | sed 's/[0-9]*//g')
+
+case "$temp_type" in
+    "C" )
+        kelvin=$(celsius_to_kelvin "$temp_value")
+        echo "${kelvin}K"
+        ;;
+    "K" )
+        celsius=$(kelvin_to_celsius "$temp_value")
+        echo "${celsius}C"
+        ;;
+    * )
+        echo "Invalid temperature type. Use 'C' for Celsius or 'K' for Kelvin."
+        exit 1
+        ;;
+esac
+
